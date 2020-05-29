@@ -1,0 +1,219 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="AR_0">
+
+	<xacro:include filename="$(find robot_description_pkg)/urdf/wheel.urdf.xacro" /> 
+	<xacro:include filename="$(find robot_description_pkg)/urdf/steering_column.urdf.xacro" /> 
+	<xacro:include filename="$(find robot_description_pkg)/urdf/transmission.urdf.xacro" />
+	<xacro:include filename="$(find robot_description_pkg)/urdf/arm.urdf.xacro" />
+
+	<!-- properties -->
+	<!--All units in m-kg-s-radians unit system -->
+	<xacro:property name="M_PI" value="3.1415926535897931" />
+	<xacro:property name="M_PI_2" value="1.570796327" />
+	<xacro:property name="DEG_TO_RAD" value="0.017453293" />
+
+	<!-- friction coefficients -->
+	<xacro:property name="MU_1" value="10000" />
+	<xacro:property name="MU_2" value="10000" />
+
+	<xacro:property name="arm_mass" value="0.4" /> 
+	<xacro:property name="steer_link_mass" value="0.5" /> 
+	<xacro:property name="wheel_mass" value="0.3" /> 
+
+	<xacro:property name="robot_height" value="0.15" />
+	<xacro:property name="axis_offset" value="0.125" />
+	<xacro:property name="steer_link_length" value="0.12" />
+	<xacro:property name="steer_link_width" value="0.03" />
+	<xacro:property name="wheel_radius" value="0.05" />
+	<xacro:property name="wheel_width" value="0.03" />
+	<xacro:property name="arm_length" value="0.6" />
+	<xacro:property name="arm_width" value="0.1" />
+	<xacro:property name="arm_thickness" value="0.025" />
+
+	 <!-- Macros for calculating inertia -->
+	<xacro:macro name="cylinder_inertia" params="m r h">
+		<inertia  ixx="${m*(3*r*r+h*h)/12}" ixy = "0" ixz = "0"
+		iyy="${m*(3*r*r+h*h)/12}" iyz = "0" izz="${m*r*r/2}" /> 
+	</xacro:macro>
+
+	<xacro:macro name="cuboid_inertia" params="m w h l">
+		<inertia  ixx="${m*(h*h+l*l)/12}" ixy = "0" ixz = "0"
+		iyy="${m*(w*w+l*l)/12}" iyz = "0" izz="${m*(h*h+w*w)/12}" /> 
+	</xacro:macro>
+
+	<!-- Materials -->
+	<material name="black">
+		<color rgba="0 0 0 1"/>
+	</material>
+	<material name="white">
+		<color rgba="1 1 1 1"/>
+	</material>
+
+	<!-- BASE-FOOTPRINT -->
+ 	<!-- base_footprint is a fictitious link(frame)that is on the ground right below base_link origin -->
+	<link name="base_footprint">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<geometry>
+				<box size="0.001 0.001 0.001" />
+			</geometry>
+		</visual>
+	</link>
+
+	<gazebo reference="base_footprint">
+		<turnGravityOff>false</turnGravityOff>
+	</gazebo>
+
+	<!-- left arm -->
+	<xacro:arm arm_name="left_arm" arm_length="${arm_length}" arm_width="${arm_width}" 
+						arm_thickness="${arm_thickness}" arm_mass="${arm_mass}" 
+						rotation_angle="0" X="${(arm_length-arm_width)/2}" Y="0" robot_height="${robot_height}" />
+
+	<!-- right arm -->
+	<xacro:arm arm_name="right_arm" arm_length="${arm_length}" arm_width="${arm_width}" 
+						arm_thickness="${arm_thickness}" arm_mass="${arm_mass}" 
+						rotation_angle="${M_PI_2}" X="0" Y="${(arm_length-arm_width)/2}" robot_height="${robot_height}" />
+
+	<!-- Joint: connect arms to base -->
+	<joint name="base_footprint_joint_l" type="fixed">
+		<origin xyz="0 0 0" rpy="0 0 0" />
+		<parent link="base_footprint"/>
+		<child link="left_arm" />
+	</joint>
+
+	<joint name="base_footprint_joint_r" type="fixed">
+		<origin xyz="0 0 0" rpy="0 0 0" />
+		<parent link="base_footprint"/>
+		<child link="right_arm" />
+	</joint>
+
+	<!-- steering link l1 -->
+	<xacro:steering_column steering_link_name="steering_link_l1" steer_link_width=
+		"${steer_link_width}" steer_link_length="${steer_link_length}" steer_link_mass="${steer_link_mass}" robot_height="${robot_height}" />
+
+	<!-- steering link l2 -->
+	<xacro:steering_column steering_link_name="steering_link_l2" steer_link_width=
+		"${steer_link_width}" steer_link_length="${steer_link_length}" steer_link_mass="${steer_link_mass}" robot_height="${robot_height}" />
+
+	<!-- steering link r1 -->
+	<xacro:steering_column steering_link_name="steering_link_r1" steer_link_width=
+		"${steer_link_width}" steer_link_length="${steer_link_length}" steer_link_mass="${steer_link_mass}" robot_height="${robot_height}" />
+
+	<!-- steering link r2 -->
+	<xacro:steering_column steering_link_name="steering_link_r2" steer_link_width=
+		"${steer_link_width}" steer_link_length="${steer_link_length}" steer_link_mass="${steer_link_mass}" robot_height="${robot_height}" />
+
+	<!-- yaw joint l1 -->
+	<joint name="yaw_joint_l1" type="continuous">
+		<parent link="left_arm"/>
+		<child link="steering_link_l1"/>
+		<origin xyz="${axis_offset} 0 0" rpy="0 0 0"/>
+		<axis xyz="0 0 1"/>
+	</joint>
+
+	<!-- yaw joint l2 -->
+	<joint name="yaw_joint_l2" type="continuous">
+		<parent link="left_arm"/>
+		<child link="steering_link_l2"/>
+		<origin xyz="${arm_length-axis_offset} 0 0" rpy="0 0 0"/>
+		<axis xyz="0 0 1"/>
+	</joint>
+
+	<!-- yaw joint r1 -->
+	<joint name="yaw_joint_r1" type="continuous">
+		<parent link="right_arm"/>
+		<child link="steering_link_r1"/>
+		<origin xyz="0 ${axis_offset} 0" rpy="0 0 0"/>
+		<axis xyz="0 0 1"/>
+	</joint>
+
+	<!-- yaw joint r2 -->
+	<joint name="yaw_joint_r2" type="continuous">
+		<parent link="right_arm"/>
+		<child link="steering_link_r2"/>
+		<origin xyz="0 ${arm_length-axis_offset} 0" rpy="0 0 0"/>
+		<axis xyz="0 0 1"/>
+	</joint>
+
+	<!-- wheel-r1 -->
+	<xacro:wheel wheel_name="r1_wheel" wheel_width="${wheel_width}" wheel_radius="
+		${wheel_radius}" wheel_mass="${wheel_mass}" MU_1="${MU_1}" MU_2="${MU_2}" 
+		M_PI_2="${M_PI_2}"/>
+
+	<!-- wheel-r2 -->
+	<xacro:wheel wheel_name="r2_wheel" wheel_width="${wheel_width}" wheel_radius="
+		${wheel_radius}" wheel_mass="${wheel_mass}" MU_1="${MU_1}" MU_2="${MU_2}" 
+		M_PI_2="${M_PI_2}"/>
+
+	<!-- wheel-l1 -->
+	<xacro:wheel wheel_name="l1_wheel" wheel_width="${wheel_width}" wheel_radius="
+		${wheel_radius}" wheel_mass="${wheel_mass}" MU_1="${MU_1}" MU_2="${MU_2}" 
+		M_PI_2="${M_PI_2}"/>
+
+	<!-- wheel-l2 -->
+	<xacro:wheel wheel_name="l2_wheel" wheel_width="${wheel_width}" wheel_radius="
+		${wheel_radius}" wheel_mass="${wheel_mass}" MU_1="${MU_1}" MU_2="${MU_2}" 
+		M_PI_2="${M_PI_2}"/>
+
+	<!-- drive joint r1 -->
+	<joint name="drive_joint_r1" type="continuous">
+		<parent link="steering_link_r1"/>
+		<child link="r1_wheel"/>
+		<origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+	</joint>
+
+	<!-- drive joint r2 -->
+	<joint name="drive_joint_r2" type="continuous">
+		<parent link="steering_link_r2"/>
+		<child link="r2_wheel"/>
+		<origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+	</joint>
+
+	<!-- drive joint l1 -->
+	<joint name="drive_joint_l1" type="continuous">
+		<parent link="steering_link_l1"/>
+		<child link="l1_wheel"/>
+		<origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+	</joint>
+
+	<!-- drive joint l2 -->
+	<joint name="drive_joint_l2" type="continuous">
+		<parent link="steering_link_l2"/>
+		<child link="l2_wheel"/>
+		<origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+	</joint>
+
+	<!-- Transmission: drive, select: effort/vel/pos interfaces -->
+	<xacro:set_transmission transmission_name="l1_wheel_joint_trans" motor_name="l1_wheel_motor" interface="VelocityJointInterface" joint_name="drive_joint_l1" />
+
+	<xacro:set_transmission transmission_name="l2_wheel_joint_trans" motor_name="l2_wheel_motor" interface="VelocityJointInterface" joint_name="drive_joint_l2" />
+
+	<xacro:set_transmission transmission_name="r1_wheel_joint_trans" motor_name=
+		"r1_wheel_motor" interface="VelocityJointInterface" joint_name="drive_joint_r1" />
+
+	<xacro:set_transmission transmission_name="r2_wheel_joint_trans" motor_name=
+		"r2_wheel_motor" interface="VelocityJointInterface" joint_name="drive_joint_r2" />
+
+	<!-- Transmission: yaw -->
+	<xacro:set_transmission transmission_name="l1_yaw_joint_trans" motor_name=
+		"l1_steer_motor" interface="PositionJointInterface" joint_name="yaw_joint_l1" />
+
+	<xacro:set_transmission transmission_name="l2_yaw_joint_trans" motor_name=
+		"l2_steer_motor" interface="PositionJointInterface" joint_name="yaw_joint_l2" />
+
+	<xacro:set_transmission transmission_name="r1_yaw_joint_trans" motor_name=
+		"r1_steer_motor" interface="PositionJointInterface" joint_name="yaw_joint_r1" />
+
+	<xacro:set_transmission transmission_name="r2_yaw_joint_trans" motor_name=
+		"r2_steer_motor" interface="PositionJointInterface" joint_name="yaw_joint_r2" />
+
+	<!-- ros_control plugin -->
+	<gazebo>
+		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+			<robotNamespace>robot_0</robotNamespace>
+			<robotBaseFrame>base_footprint</robotBaseFrame>
+			<legacyModeNS>true</legacyModeNS>
+		</plugin>
+	</gazebo>
+
+</robot>

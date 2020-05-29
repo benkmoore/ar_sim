@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<robot name="arm" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:macro name="arm" params="arm_name arm_length arm_width arm_thickness arm_mass
+							 rotation_angle X Y robot_height">
+
+		<link name="${arm_name}">
+			<visual>
+				<geometry>
+					<box size="${arm_length} ${arm_width} ${arm_thickness}"/>
+				</geometry>
+				<origin rpy="0 0 ${rotation_angle}" xyz="${X} ${Y} ${robot_height}"/>
+				<material name="white"/>
+			</visual>
+			<collision>
+				<geometry>
+					<box size="${arm_length} ${arm_width} ${arm_thickness}"/>
+				</geometry>
+				<origin rpy="0 0 ${rotation_angle}" xyz="${X} ${Y} ${robot_height}"/>
+			</collision>
+			<inertial>
+				<mass value="${arm_mass}"/>
+				<inertia ixx="${arm_mass}" ixy="0.0" ixz="0.0" iyy="${arm_mass}" 
+					iyz="0.0" izz="${arm_mass}"/>
+			</inertial>
+		</link>
+
+		<gazebo reference="${arm_name}">
+			<turnGravityOff>false</turnGravityOff>
+		</gazebo>					
+
+	</xacro:macro>
+</robot>

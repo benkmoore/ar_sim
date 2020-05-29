@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<robot name="AR_0">>
+	<!-- left arm -->
+	<link name="left_arm">
+		<visual>
+			<geometry>
+				<box size="0.6 0.1 0.2"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0.25 0 0"/>
+			<material name="white">
+				<color rgba="1 1 1 1"/>
+  			</material>
+		</visual>
+	</link>
+
+	<!-- right arm -->
+	<link name="right_arm">
+		<visual>
+			<geometry>
+				<box size="0.6 0.1 0.2"/>
+			</geometry>
+			<origin rpy="0 0 1.57075" xyz="0 0.25 0"/>
+			<material name="white">
+				<color rgba="1 1 1 1"/>
+  			</material>
+		</visual>
+	</link>
+
+	<!-- center joint -->
+	<joint name="center_joint" type="continuous">
+		<parent link="left_arm"/>
+		<child link="right_arm"/>
+		<origin xyz="0 0 0.2"/>
+		<axis xyz="0 0 1" />
+		<!--limit effort="300" velocity="0.1" lower="-3.14" upper="3.14"/>-->
+	</joint>
+</robot> 
