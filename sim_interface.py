@@ -3,6 +3,7 @@
 import rospy
 import numpy as np
 
+from ar_commander.msg import ControllerCmd
 from gazebo_msgs.msg import ModelStates
 from geometry_msgs.msg import Pose2D
 from std_msgs.msg import Float64MultiArray, Float64
@@ -23,7 +24,7 @@ class SimInterface():
 		self.theta = None
 
 		# GNC commands to sim joint inputs
-		rospy.Subscriber('/controller_cmds', Float64MultiArray, self.control_cmdsCallback)
+		rospy.Subscriber('/controller_cmds', ControllerCmd, self.control_cmdsCallback)
 
 		self.control_cmds = None
 		self.V_cmd = None
@@ -39,13 +40,9 @@ class SimInterface():
 		self.cmdV8_pub = rospy.Publisher("/robot_0/joint8_velocity_controller/command",Float64, queue_size=10)
 
 
-	def control_cmds2JointInputs(self):
-		self.V_cmd = self.control_cmds[0:4]
-		self.phi_cmd = self.control_cmds[4] # phi1 = self.gnc_cmds[4], phi2 = self.gnc_cmds[5]
-
 	def control_cmdsCallback(self, msg):
-		self.control_cmds = msg.data
-		self.control_cmds2JointInputs()
+		self.V_cmd = msg.velocities.data
+		self.phi_cmd = msg.phis.data[0] #[phi1, phi2]
 
 	def modelStates2Pose2D(self):
 		self.pose.x = self.pos.x
