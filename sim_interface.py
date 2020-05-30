@@ -14,7 +14,7 @@ from tf.transformations import euler_from_quaternion
 class SimInterface():
 	def __init__(self):
 		# gazebo model states to Pose2D
-		rospy.init_node('robot_pose')
+		rospy.init_node('sim_interface')
 		self.pub_pose = rospy.Publisher('pose', Pose2D, queue_size=10)
 
 		rospy.Subscriber('/gazebo/model_states', ModelStates, self.model_statesCallback)
