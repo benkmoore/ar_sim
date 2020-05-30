@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<robot name="wheel" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:macro name="wheel" params="wheel_name wheel_width wheel_radius wheel_mass
+										MU_1 MU_2 M_PI_2">
+		<link name="${wheel_name}">
+			<visual>
+				<origin xyz="0 0 0" rpy="0 ${M_PI_2} 0" /> 
+				<geometry>
+					<cylinder length="${wheel_width}" radius="${wheel_radius}" />
+				</geometry>
+				<material name="black"/>
+			</visual>
+			<collision>
+				<origin xyz="0 0 0" rpy="0 ${M_PI_2} 0" /> 
+				<geometry>
+					<cylinder length="${wheel_width}" radius="${wheel_radius}" />
+				</geometry>
+			</collision>
+			<inertial>
+				<mass value="${wheel_mass}"/>
+				<xacro:cylinder_inertia  m="${wheel_mass}" r="${wheel_radius}" h="${wheel_width}" />
+			</inertial>
+			<surface>
+				<friction>
+					<ode>
+						<mu1 value="${MU_1}" />
+						<mu2 value="${MU_2}" />
+					</ode>
+				</friction>
+			</surface>
+		</link>
+
+		<gazebo reference="${wheel_name}">
+			<turnGravityOff>false</turnGravityOff>
+			<material>Gazebo/Black</material>
+		</gazebo>
+
+	</xacro:macro>
+</robot>

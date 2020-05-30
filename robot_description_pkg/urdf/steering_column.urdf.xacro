@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<robot name="wheel" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:macro name="steering_column" params="steering_link_name steer_link_width steer_link_length steer_link_mass robot_height">
+
+		<link name="${steering_link_name}">
+			<visual>
+				<geometry>
+					<box size="${steer_link_width} ${steer_link_width} ${steer_link_length}"/>
+				</geometry>
+				<origin rpy="0 0 0" xyz="0 0 ${robot_height-steer_link_length/2}"/>
+				<material name="white"/>
+			</visual>
+			<collision>
+				<geometry>
+					<box size="${steer_link_width} ${steer_link_width} ${steer_link_length/4}"/>
+				</geometry>
+				<origin rpy="0 0 0" xyz="0 0 ${robot_height-steer_link_length/2}"/>
+			</collision>
+			<inertial>
+				<mass value="${steer_link_mass}"/>
+				<xacro:cuboid_inertia m="${steer_link_mass}" w="${steer_link_width}" h="
+					${steer_link_width}" l="${steer_link_length}" />
+			</inertial>
+		</link>
+
+		<gazebo reference="${steering_link_name}">
+			<turnGravityOff>false</turnGravityOff>
+		</gazebo>
+	</xacro:macro>
+</robot>
