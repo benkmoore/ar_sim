@@ -41,8 +41,8 @@ class SimInterface():
 
 
 	def control_cmdsCallback(self, msg):
-		self.V_cmd = msg.velocities.data
-		self.phi_cmd = msg.phis.data[0] #[phi1, phi2]
+		self.V_cmd = msg.velocity_arr.data
+		self.phi_cmd = msg.phi_arr.data[0] #[phi1, phi2]
 
 	def modelStates2Pose2D(self):
 		self.pose.x = self.pos.x
