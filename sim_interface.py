@@ -42,7 +42,7 @@ class SimInterface():
 
 	def control_cmdsCallback(self, msg):
 		self.V_cmd = msg.velocity_arr.data
-		self.phi_cmd = msg.phi_arr.data[0] #[phi1, phi2]
+		self.phi_cmd = msg.phi_arr.data
 
 	def modelStates2Pose2D(self):
 		self.pose.x = self.pos.x
@@ -63,10 +63,10 @@ class SimInterface():
 
 			# Publish GNC cmds to sim joints
 			if self.phi_cmd != None and self.V_cmd != None:
-				self.cmdP1_pub.publish(self.phi_cmd) 	# yaw_joint_l1
-				self.cmdP2_pub.publish(self.phi_cmd) 	# yaw_joint_l2
-				self.cmdP3_pub.publish(self.phi_cmd) 	# yaw_joint_r1
-				self.cmdP4_pub.publish(self.phi_cmd) 	# yaw_joint_r2
+				self.cmdP1_pub.publish(self.phi_cmd[2]) 	# yaw_joint_l1 -> inner on r2
+				self.cmdP2_pub.publish(self.phi_cmd[3]) 	# yaw_joint_l2 -> outer on r2
+				self.cmdP3_pub.publish(self.phi_cmd[0]) 	# yaw_joint_r1 -> inner on r1
+				self.cmdP4_pub.publish(self.phi_cmd[1]) 	# yaw_joint_r2 -> outer on r1
 				self.cmdV5_pub.publish(self.V_cmd[0]) 	# drive_joint_l1
 				self.cmdV6_pub.publish(self.V_cmd[1]) 	# drive_joint_l2
 				self.cmdV7_pub.publish(self.V_cmd[2]) 	# drive_joint_r1
