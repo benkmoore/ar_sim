@@ -22,7 +22,7 @@
   <!-- Load joint controller configurations from YAML file to parameter server -->
   <rosparam file="$(find gazebo_interface)/config/robot_control.yaml" command="load"/>
 
-   <!-- load the controllers -->
+  <!-- load the controllers -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
     output="screen" ns="/robot_0" args="joint1_position_controller
                                       joint2_position_controller
@@ -42,5 +42,8 @@
   <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
     args="-urdf -model robot_0 -param robot_description -x 0 -y 0 -z 0"/>
+
+  <!-- Start simulation interface -->
+  <node pkg="gazebo_interface" type="sim_interface.py" name="sim_interface" output="screen" />
 
 </launch>
