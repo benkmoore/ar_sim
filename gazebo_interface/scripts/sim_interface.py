@@ -50,10 +50,11 @@ class SimInterface():
         self.pose.theta = self.theta
 
     def model_statesCallback(self, msg):
-        self.pos = msg.pose[1].position
-        self.q = msg.pose[1].orientation
-        _, _, self.theta = euler_from_quaternion([self.q.x, self.q.y, self.q.z, self.q.w])
-        self.modelStates2Pose2D()
+        if len(msg.pose) >= 2:
+            self.pos = msg.pose[1].position
+            self.q = msg.pose[1].orientation
+            _, _, self.theta = euler_from_quaternion([self.q.x, self.q.y, self.q.z, self.q.w])
+            self.modelStates2Pose2D()
 
     def run(self):
         rate = rospy.Rate(10) # 10 Hz
