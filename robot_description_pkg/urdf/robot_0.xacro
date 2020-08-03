@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="AR_0">
 
-	<xacro:include filename="$(find robot_description_pkg)/urdf/wheel.urdf.xacro" /> 
-	<xacro:include filename="$(find robot_description_pkg)/urdf/steering_column.urdf.xacro" /> 
+	<xacro:include filename="$(find robot_description_pkg)/urdf/wheel.urdf.xacro" />
+	<xacro:include filename="$(find robot_description_pkg)/urdf/steering_column.urdf.xacro" />
 	<xacro:include filename="$(find robot_description_pkg)/urdf/transmission.urdf.xacro" />
 	<xacro:include filename="$(find robot_description_pkg)/urdf/arm.urdf.xacro" />
 
@@ -16,9 +16,9 @@
 	<xacro:property name="MU_1" value="10000" />
 	<xacro:property name="MU_2" value="10000" />
 
-	<xacro:property name="arm_mass" value="0.4" /> 
-	<xacro:property name="steer_link_mass" value="0.5" /> 
-	<xacro:property name="wheel_mass" value="0.3" /> 
+	<xacro:property name="arm_mass" value="0.4" />
+	<xacro:property name="steer_link_mass" value="0.5" />
+	<xacro:property name="wheel_mass" value="0.3" />
 
 	<xacro:property name="robot_height" value="0.15" />
 	<xacro:property name="axis_offset" value="0.125" />
@@ -33,12 +33,12 @@
 	 <!-- Macros for calculating inertia -->
 	<xacro:macro name="cylinder_inertia" params="m r h">
 		<inertia  ixx="${m*(3*r*r+h*h)/12}" ixy = "0" ixz = "0"
-		iyy="${m*(3*r*r+h*h)/12}" iyz = "0" izz="${m*r*r/2}" /> 
+		iyy="${m*(3*r*r+h*h)/12}" iyz = "0" izz="${m*r*r/2}" />
 	</xacro:macro>
 
 	<xacro:macro name="cuboid_inertia" params="m w h l">
 		<inertia  ixx="${m*(h*h+l*l)/12}" ixy = "0" ixz = "0"
-		iyy="${m*(w*w+l*l)/12}" iyz = "0" izz="${m*(h*h+w*w)/12}" /> 
+		iyy="${m*(w*w+l*l)/12}" iyz = "0" izz="${m*(h*h+w*w)/12}" />
 	</xacro:macro>
 
 	<!-- Materials -->
@@ -65,13 +65,13 @@
 	</gazebo>
 
 	<!-- left arm -->
-	<xacro:arm arm_name="left_arm" arm_length="${arm_length}" arm_width="${arm_width}" 
-						arm_thickness="${arm_thickness}" arm_mass="${arm_mass}" 
+	<xacro:arm arm_name="left_arm" arm_length="${arm_length}" arm_width="${arm_width}"
+						arm_thickness="${arm_thickness}" arm_mass="${arm_mass}"
 						rotation_angle="0" X="${(arm_length-arm_width)/2}" Y="0" robot_height="${robot_height}" />
 
 	<!-- right arm -->
-	<xacro:arm arm_name="right_arm" arm_length="${arm_length}" arm_width="${arm_width}" 
-						arm_thickness="${arm_thickness}" arm_mass="${arm_mass}" 
+	<xacro:arm arm_name="right_arm" arm_length="${arm_length}" arm_width="${arm_width}"
+						arm_thickness="${arm_thickness}" arm_mass="${arm_mass}"
 						rotation_angle="${M_PI_2}" X="0" Y="${(arm_length-arm_width)/2}" robot_height="${robot_height}" />
 
 	<!-- Joint: connect arms to base -->
@@ -137,50 +137,50 @@
 
 	<!-- wheel-r1 -->
 	<xacro:wheel wheel_name="r1_wheel" wheel_width="${wheel_width}" wheel_radius="
-		${wheel_radius}" wheel_mass="${wheel_mass}" MU_1="${MU_1}" MU_2="${MU_2}" 
+		${wheel_radius}" wheel_mass="${wheel_mass}" MU_1="${MU_1}" MU_2="${MU_2}"
 		M_PI_2="${M_PI_2}"/>
 
 	<!-- wheel-r2 -->
 	<xacro:wheel wheel_name="r2_wheel" wheel_width="${wheel_width}" wheel_radius="
-		${wheel_radius}" wheel_mass="${wheel_mass}" MU_1="${MU_1}" MU_2="${MU_2}" 
+		${wheel_radius}" wheel_mass="${wheel_mass}" MU_1="${MU_1}" MU_2="${MU_2}"
 		M_PI_2="${M_PI_2}"/>
 
 	<!-- wheel-l1 -->
 	<xacro:wheel wheel_name="l1_wheel" wheel_width="${wheel_width}" wheel_radius="
-		${wheel_radius}" wheel_mass="${wheel_mass}" MU_1="${MU_1}" MU_2="${MU_2}" 
+		${wheel_radius}" wheel_mass="${wheel_mass}" MU_1="${MU_1}" MU_2="${MU_2}"
 		M_PI_2="${M_PI_2}"/>
 
 	<!-- wheel-l2 -->
 	<xacro:wheel wheel_name="l2_wheel" wheel_width="${wheel_width}" wheel_radius="
-		${wheel_radius}" wheel_mass="${wheel_mass}" MU_1="${MU_1}" MU_2="${MU_2}" 
+		${wheel_radius}" wheel_mass="${wheel_mass}" MU_1="${MU_1}" MU_2="${MU_2}"
 		M_PI_2="${M_PI_2}"/>
 
 	<!-- drive joint r1 -->
 	<joint name="drive_joint_r1" type="continuous">
 		<parent link="steering_link_r1"/>
 		<child link="r1_wheel"/>
-		<origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+		<origin xyz="0 0 ${wheel_radius}" rpy="0 0 -${M_PI_2}"/>
 	</joint>
 
 	<!-- drive joint r2 -->
 	<joint name="drive_joint_r2" type="continuous">
 		<parent link="steering_link_r2"/>
 		<child link="r2_wheel"/>
-		<origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+		<origin xyz="0 0 ${wheel_radius}" rpy="0 0 -${M_PI_2}"/>
 	</joint>
 
 	<!-- drive joint l1 -->
 	<joint name="drive_joint_l1" type="continuous">
 		<parent link="steering_link_l1"/>
 		<child link="l1_wheel"/>
-		<origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+		<origin xyz="0 0 ${wheel_radius}" rpy="0 0 -${M_PI_2}"/>
 	</joint>
 
 	<!-- drive joint l2 -->
 	<joint name="drive_joint_l2" type="continuous">
 		<parent link="steering_link_l2"/>
 		<child link="l2_wheel"/>
-		<origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+		<origin xyz="0 0 ${wheel_radius}" rpy="0 0 -${M_PI_2}"/>
 	</joint>
 
 	<!-- Transmission: drive, select: effort/vel/pos interfaces -->

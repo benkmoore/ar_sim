@@ -5,14 +5,14 @@
 										MU_1 MU_2 M_PI_2">
 		<link name="${wheel_name}">
 			<visual>
-				<origin xyz="0 0 0" rpy="0 ${M_PI_2} 0" /> 
+				<origin xyz="0 0 0" rpy="0 ${M_PI_2} 0" />
 				<geometry>
 					<cylinder length="${wheel_width}" radius="${wheel_radius}" />
 				</geometry>
 				<material name="black"/>
 			</visual>
 			<collision>
-				<origin xyz="0 0 0" rpy="0 ${M_PI_2} 0" /> 
+				<origin xyz="0 0 0" rpy="0 ${M_PI_2} 0" />
 				<geometry>
 					<cylinder length="${wheel_width}" radius="${wheel_radius}" />
 				</geometry>
