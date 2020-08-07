@@ -63,7 +63,7 @@ class SimInterface():
             self.pub_pose.publish(self.pose)
 
             # Publish GNC cmds to sim joints
-            if self.phi_cmd != None and self.V_cmd != None:
+            if self.phi_cmd != None and self.W_cmd != None:
                 self.cmdP1_pub.publish(self.phi_cmd[2]+np.pi)     # yaw_joint_l1 -> inner on r2
                 self.cmdP2_pub.publish(self.phi_cmd[3]+np.pi)     # yaw_joint_l2 -> outer on r2
                 self.cmdP3_pub.publish(self.phi_cmd[0]+np.pi)     # yaw_joint_r1 -> inner on r1
