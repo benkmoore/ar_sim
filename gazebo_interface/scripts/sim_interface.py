@@ -27,7 +27,7 @@ class SimInterface():
         rospy.Subscriber('/controller_cmds', ControllerCmd, self.control_cmdsCallback)
 
         self.control_cmds = None
-        self.V_cmd = None
+        self.W_cmd = None
         self.phi_cmd = None
 
         self.cmdP1_pub = rospy.Publisher("/robot_0/joint1_position_controller/command",Float64, queue_size=10)
@@ -41,7 +41,7 @@ class SimInterface():
 
 
     def control_cmdsCallback(self, msg):
-        self.V_cmd = msg.velocity_arr.data
+        self.W_cmd = msg.omega_arr.data
         self.phi_cmd = msg.phi_arr.data
 
     def modelStates2Pose2D(self):
@@ -63,15 +63,15 @@ class SimInterface():
             self.pub_pose.publish(self.pose)
 
             # Publish GNC cmds to sim joints
-            if self.phi_cmd != None and self.V_cmd != None:
+            if self.phi_cmd != None and self.W_cmd != None:
                 self.cmdP1_pub.publish(self.phi_cmd[2])     # yaw_joint_l1 -> inner on r2
                 self.cmdP2_pub.publish(self.phi_cmd[3])     # yaw_joint_l2 -> outer on r2
                 self.cmdP3_pub.publish(self.phi_cmd[0])     # yaw_joint_r1 -> inner on r1
                 self.cmdP4_pub.publish(self.phi_cmd[1])     # yaw_joint_r2 -> outer on r1
-                self.cmdV5_pub.publish(self.V_cmd[0])   # drive_joint_l1
-                self.cmdV6_pub.publish(self.V_cmd[1])   # drive_joint_l2
-                self.cmdV7_pub.publish(self.V_cmd[2])   # drive_joint_r1
-                self.cmdV8_pub.publish(self.V_cmd[3])   # drive_joint_r2
+                self.cmdV5_pub.publish(self.W_cmd[0])   # drive_joint_l1
+                self.cmdV6_pub.publish(self.W_cmd[1])   # drive_joint_l2
+                self.cmdV7_pub.publish(self.W_cmd[2])   # drive_joint_r1
+                self.cmdV8_pub.publish(self.W_cmd[3])   # drive_joint_r2
 
             rate.sleep()
 
