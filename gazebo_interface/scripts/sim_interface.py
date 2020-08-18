@@ -15,20 +15,10 @@ class SimInterface():
     def __init__(self):
         # gazebo model states to Pose2D
         rospy.init_node('sim_interface')
+
+        # publishers
         self.pub_pose = rospy.Publisher('pose', Pose2D, queue_size=10)
-
-        rospy.Subscriber('/gazebo/model_states', ModelStates, self.model_statesCallback)
-
-        self.pose = Pose2D()
-        self.pos = None
-        self.theta = None
-
-        # GNC commands to sim joint inputs
-        rospy.Subscriber('/controller_cmds', ControllerCmd, self.control_cmdsCallback)
-
-        self.control_cmds = None
-        self.W_cmd = None
-        self.phi_cmd = None
+        self.pub_localize = rospy.Publisher('sensor/decawave_measurement', Pose2D, queue_size=10)
 
         self.cmdP1_pub = rospy.Publisher("/robot_0/joint1_position_controller/command",Float64, queue_size=10)
         self.cmdP2_pub = rospy.Publisher("/robot_0/joint2_position_controller/command",Float64, queue_size=10)
@@ -39,6 +29,17 @@ class SimInterface():
         self.cmdV7_pub = rospy.Publisher("/robot_0/joint7_velocity_controller/command",Float64, queue_size=10)
         self.cmdV8_pub = rospy.Publisher("/robot_0/joint8_velocity_controller/command",Float64, queue_size=10)
 
+        # subscribers
+        rospy.Subscriber('/gazebo/model_states', ModelStates, self.model_statesCallback)
+        rospy.Subscriber('/controller_cmds', ControllerCmd, self.control_cmdsCallback)
+
+        self.pose = Pose2D()
+        self.pos = None
+        self.theta = None
+        self.control_cmds = None
+        self.W_cmd = None
+        self.phi_cmd = None
+        self.loc_noise = 0.25 # m
 
     def control_cmdsCallback(self, msg):
         self.W_cmd = msg.omega_arr.data
@@ -56,18 +57,26 @@ class SimInterface():
             _, _, self.theta = euler_from_quaternion([self.q.x, self.q.y, self.q.z, self.q.w])
             self.modelStates2Pose2D()
 
+            # publish noisy localization data
+            loc = Pose2D()
+            loc.x = self.pose.x + np.random.uniform(-self.loc_noise, self.loc_noise, 1)
+            loc.y = self.pose.y + np.random.uniform(-self.loc_noise, self.loc_noise, 1)
+            loc.theta = 0
+            self.pub_localize.publish(loc)
+
+
     def run(self):
         rate = rospy.Rate(10) # 10 Hz
         while not rospy.is_shutdown():
-            # Publish pose to GNC
+            # Publish pose to GNC & localization
             self.pub_pose.publish(self.pose)
 
             # Publish GNC cmds to sim joints
             if self.phi_cmd != None and self.W_cmd != None:
-                self.cmdP1_pub.publish(self.phi_cmd[2]+np.pi)     # yaw_joint_l1 -> inner on r2
-                self.cmdP2_pub.publish(self.phi_cmd[3]+np.pi)     # yaw_joint_l2 -> outer on r2
-                self.cmdP3_pub.publish(self.phi_cmd[0]+np.pi)     # yaw_joint_r1 -> inner on r1
-                self.cmdP4_pub.publish(self.phi_cmd[1]+np.pi)     # yaw_joint_r2 -> outer on r1
+                self.cmdP1_pub.publish(self.phi_cmd[2]+np.pi/2)     # yaw_joint_l1 -> inner on r2
+                self.cmdP2_pub.publish(self.phi_cmd[3]+np.pi/2)     # yaw_joint_l2 -> outer on r2
+                self.cmdP3_pub.publish(self.phi_cmd[0]+np.pi/2)     # yaw_joint_r1 -> inner on r1
+                self.cmdP4_pub.publish(self.phi_cmd[1]+np.pi/2)     # yaw_joint_r2 -> outer on r1
                 self.cmdV5_pub.publish(self.W_cmd[0])   # drive_joint_l1
                 self.cmdV6_pub.publish(self.W_cmd[1])   # drive_joint_l2
                 self.cmdV7_pub.publish(self.W_cmd[2])   # drive_joint_r1
