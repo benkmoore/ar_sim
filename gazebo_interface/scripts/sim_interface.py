@@ -47,7 +47,7 @@ class SimInterface():
     def modelStates2Pose2D(self):
         self.pose.x = self.pos.x
         self.pose.y = self.pos.y
-        self.pose.theta = self.theta if self.theta > 0 else 2*np.pi+self.theta # wrap angle to [0, 2pi], sim outputs [-pi, pi]
+        self.pose.theta = self.theta # sim outputs [-pi, pi]
 
     def model_statesCallback(self, msg):
         if len(msg.pose) >= 2:

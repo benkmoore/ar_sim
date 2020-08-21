@@ -107,7 +107,7 @@
 	<joint name="yaw_joint_l1" type="continuous">
 		<parent link="left_arm"/>
 		<child link="steering_link_l1"/>
-		<origin xyz="${axis_offset} 0 0" rpy="0 0 0"/>
+		<origin xyz="${axis_offset} 0 0" rpy="0 0 ${M_PI}"/>
 		<axis xyz="0 0 1"/>
 	</joint>
 
@@ -115,7 +115,7 @@
 	<joint name="yaw_joint_l2" type="continuous">
 		<parent link="left_arm"/>
 		<child link="steering_link_l2"/>
-		<origin xyz="${arm_length-axis_offset} 0 0" rpy="0 0 0"/>
+		<origin xyz="${arm_length-axis_offset} 0 0" rpy="0 0 ${M_PI}"/>
 		<axis xyz="0 0 1"/>
 	</joint>
 
@@ -123,7 +123,7 @@
 	<joint name="yaw_joint_r1" type="continuous">
 		<parent link="right_arm"/>
 		<child link="steering_link_r1"/>
-		<origin xyz="0 ${axis_offset} 0" rpy="0 0 0"/>
+		<origin xyz="0 ${axis_offset} 0" rpy="0 0 ${M_PI}"/>
 		<axis xyz="0 0 1"/>
 	</joint>
 
@@ -131,7 +131,7 @@
 	<joint name="yaw_joint_r2" type="continuous">
 		<parent link="right_arm"/>
 		<child link="steering_link_r2"/>
-		<origin xyz="0 ${arm_length-axis_offset} 0" rpy="0 0 0"/>
+		<origin xyz="0 ${arm_length-axis_offset} 0" rpy="0 0 ${M_PI}"/>
 		<axis xyz="0 0 1"/>
 	</joint>
 
