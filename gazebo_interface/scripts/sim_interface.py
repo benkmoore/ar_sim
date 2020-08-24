@@ -2,12 +2,24 @@
 
 import rospy
 import numpy as np
+import sys
 
 from ar_commander.msg import ControllerCmd
 from gazebo_msgs.msg import ModelStates
 from geometry_msgs.msg import Pose2D
 from std_msgs.msg import Float64MultiArray, Float64
 from tf.transformations import euler_from_quaternion
+
+env = rospy.get_param("ENV")
+sys.path.append(rospy.get_param("AR_COMMANDER_DIR"))
+
+if env == "sim":
+    import configs.sim_params as params
+elif env == "hardware":
+    import configs.hardware_params as params
+else:
+    raise ValueError("Controller ENV: '{}' is not valid. Select from [sim, hardware]".format(env))
+
 
 # take model states msg and publish a curr pose in Pose2D format
 
@@ -17,8 +29,8 @@ class SimInterface():
         rospy.init_node('sim_interface')
 
         # publishers
-        self.pub_pose = rospy.Publisher('pose', Pose2D, queue_size=10)
-        self.pub_localize = rospy.Publisher('sensor/decawave_measurement', Pose2D, queue_size=10)
+        self.pose_pub = rospy.Publisher('pose', Pose2D, queue_size=10)
+        self.decawave_pub = rospy.Publisher('sensor/decawave_measurement', Pose2D, queue_size=10)
 
         self.cmdP1_pub = rospy.Publisher("/robot_0/joint1_position_controller/command",Float64, queue_size=10)
         self.cmdP2_pub = rospy.Publisher("/robot_0/joint2_position_controller/command",Float64, queue_size=10)
@@ -39,7 +51,7 @@ class SimInterface():
         self.control_cmds = None
         self.W_cmd = None
         self.phi_cmd = None
-        self.loc_noise = 0.25 # m
+        self.loc_noise = params.localization_noise
 
     def control_cmdsCallback(self, msg):
         self.W_cmd = msg.omega_arr.data
@@ -68,7 +80,7 @@ class SimInterface():
     def run(self):
         rate = rospy.Rate(10) # 10 Hz
         while not rospy.is_shutdown():
-            # Publish pose to GNC & localization
+            # Publish pose to GNC
             self.pub_pose.publish(self.pose)
 
             # Publish GNC cmds to sim joints
