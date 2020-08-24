@@ -39,7 +39,6 @@ class SimInterface():
         # publishers
         self.pose_pub = rospy.Publisher('pose', Pose2D, queue_size=10)
         self.decawave_pub = rospy.Publisher('sensor/decawave_measurement', Pose2D, queue_size=10)
-        self.pub_pose = rospy.Publisher('pose', Pose2D, queue_size=10)
 
         self.cmdP1_pub = rospy.Publisher("/robot_0/joint1_position_controller/command",Float64, queue_size=10)
         self.cmdP2_pub = rospy.Publisher("/robot_0/joint2_position_controller/command",Float64, queue_size=10)
