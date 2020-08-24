@@ -15,21 +15,20 @@ class SimInterface():
     def __init__(self):
         # gazebo model states to Pose2D
         rospy.init_node('sim_interface')
-        self.pub_pose = rospy.Publisher('pose', Pose2D, queue_size=10)
-
-        rospy.Subscriber('/gazebo/model_states', ModelStates, self.model_statesCallback)
 
         self.pose = Pose2D()
         self.pos = None
         self.theta = None
-
-        # GNC commands to sim joint inputs
-        rospy.Subscriber('/controller_cmds', ControllerCmd, self.control_cmdsCallback)
-
         self.control_cmds = None
         self.W_cmd = None
         self.phi_cmd = None
 
+        # subscribers
+        rospy.Subscriber('/controller_cmds', ControllerCmd, self.control_cmdsCallback)
+        rospy.Subscriber('/gazebo/model_states', ModelStates, self.model_statesCallback)
+
+        # publishers
+        self.pub_pose = rospy.Publisher('pose', Pose2D, queue_size=10)
         self.cmdP1_pub = rospy.Publisher("/robot_0/joint1_position_controller/command",Float64, queue_size=10)
         self.cmdP2_pub = rospy.Publisher("/robot_0/joint2_position_controller/command",Float64, queue_size=10)
         self.cmdP3_pub = rospy.Publisher("/robot_0/joint3_position_controller/command",Float64, queue_size=10)
@@ -38,7 +37,6 @@ class SimInterface():
         self.cmdV6_pub = rospy.Publisher("/robot_0/joint6_velocity_controller/command",Float64, queue_size=10)
         self.cmdV7_pub = rospy.Publisher("/robot_0/joint7_velocity_controller/command",Float64, queue_size=10)
         self.cmdV8_pub = rospy.Publisher("/robot_0/joint8_velocity_controller/command",Float64, queue_size=10)
-
 
     def control_cmdsCallback(self, msg):
         self.W_cmd = msg.omega_arr.data
