@@ -76,14 +76,14 @@ class SimInterface():
             loc.x = self.pose.x + np.random.uniform(-self.loc_noise, self.loc_noise, 1)
             loc.y = self.pose.y + np.random.uniform(-self.loc_noise, self.loc_noise, 1)
             loc.theta = 0
-            self.pub_localize.publish(loc)
+            self.decawave_pub.publish(loc)
 
 
     def run(self):
         rate = rospy.Rate(10) # 10 Hz
         while not rospy.is_shutdown():
             # Publish pose to GNC
-            self.pub_pose.publish(self.pose)
+            self.pose_pub.publish(self.pose)
 
             # Publish GNC cmds to sim joints
             if self.phi_cmd != None and self.W_cmd != None:
