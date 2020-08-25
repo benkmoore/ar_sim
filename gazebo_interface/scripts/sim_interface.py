@@ -10,16 +10,8 @@ from geometry_msgs.msg import Pose2D
 from std_msgs.msg import Float64MultiArray, Float64
 from tf.transformations import euler_from_quaternion
 
-env = rospy.get_param("ENV")
-sys.path.append(rospy.get_param("AR_COMMANDER_DIR"))
-
-if env == "sim":
-    import configs.sim_params as params
-elif env == "hardware":
-    import configs.hardware_params as params
-else:
-    raise ValueError("Controller ENV: '{}' is not valid. Select from [sim, hardware]".format(env))
-
+sys.path.append(rospy.get_param("GAZEBO_DIR"))
+import config.sim_interface_params as params
 
 # take model states msg and publish a curr pose in Pose2D format
 
@@ -34,7 +26,8 @@ class SimInterface():
         self.control_cmds = None
         self.W_cmd = None
         self.phi_cmd = None
-        self.loc_noise = params.localization_noise
+        self.pos_noise = params.position_noise
+        self.theta_noise = params.theta_noise
 
         # publishers
         self.pose_pub = rospy.Publisher('pose', Pose2D, queue_size=10)
@@ -72,9 +65,9 @@ class SimInterface():
 
             # publish noisy localization data
             loc = Pose2D()
-            loc.x = self.pose.x + np.random.uniform(-self.loc_noise, self.loc_noise, 1)
-            loc.y = self.pose.y + np.random.uniform(-self.loc_noise, self.loc_noise, 1)
-            loc.theta = 0
+            loc.x = self.pose.x + np.random.uniform(-self.pos_noise, self.pos_noise, 1)
+            loc.y = self.pose.y + np.random.uniform(-self.pos_noise, self.pos_noise, 1)
+            loc.theta = self.pose.theta + np.random.uniform(-self.theta_noise, self.theta_noise, 1)
             self.decawave_pub.publish(loc)
 
 
