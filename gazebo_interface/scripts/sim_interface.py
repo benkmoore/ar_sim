@@ -4,14 +4,17 @@ import rospy
 import numpy as np
 import sys
 
-from ar_commander.msg import ControllerCmd
+from ar_commander.msg import ControllerCmd, Decawave
 from gazebo_msgs.msg import ModelStates
 from geometry_msgs.msg import Pose2D
 from std_msgs.msg import Float64MultiArray, Float64
 from tf.transformations import euler_from_quaternion
 
 sys.path.append(rospy.get_param("GAZEBO_DIR"))
+sys.path.append(rospy.get_param("AR_COMMANDER_DIR"))
+
 import config.sim_interface_params as params
+import configs.robot_v1 as rcfg
 
 # take model states msg and publish a curr pose in Pose2D format
 
@@ -31,7 +34,7 @@ class SimInterface():
 
         # publishers
         self.pose_pub = rospy.Publisher('pose', Pose2D, queue_size=10)
-        self.decawave_pub = rospy.Publisher('sensor/decawave_measurement', Pose2D, queue_size=10)
+        self.decawave_pub = rospy.Publisher('sensor/decawave_measurement', Decawave, queue_size=10)
 
         self.cmdP1_pub = rospy.Publisher("/robot_0/joint1_position_controller/command",Float64, queue_size=10)
         self.cmdP2_pub = rospy.Publisher("/robot_0/joint2_position_controller/command",Float64, queue_size=10)
@@ -63,11 +66,16 @@ class SimInterface():
             _, _, self.theta = euler_from_quaternion([self.q.x, self.q.y, self.q.z, self.q.w])
             self.modelStates2Pose2D()
 
-            # publish noisy localization data
-            loc = Pose2D()
-            loc.x = self.pose.x + np.random.uniform(-self.pos_noise, self.pos_noise, 1)
-            loc.y = self.pose.y + np.random.uniform(-self.pos_noise, self.pos_noise, 1)
-            loc.theta = self.pose.theta + np.random.uniform(-self.theta_noise, self.theta_noise, 1)
+            # publish noisy localization data and transform to end of robot arms
+            loc = Decawave()
+            # sensor on Y axis arm
+            loc.x1.data = self.pose.x + rcfg.L*np.sin(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
+            loc.y1.data = self.pose.y + rcfg.L*np.cos(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
+            # sensor on X axis arm
+            loc.x2.data = self.pose.x + rcfg.L*np.cos(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
+            loc.y2.data = self.pose.y + rcfg.L*np.sin(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
+            loc.theta.data = self.pose.theta + np.random.uniform(-self.theta_noise, self.theta_noise)
+
             self.decawave_pub.publish(loc)
 
 
