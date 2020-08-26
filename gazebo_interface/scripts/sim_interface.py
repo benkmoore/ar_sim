@@ -69,7 +69,7 @@ class SimInterface():
             # publish noisy localization data and transform to end of robot arms
             loc = Decawave()
             # sensor on Y axis arm
-            loc.x1.data = self.pose.x + rcfg.L*np.sin(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
+            loc.x1.data = self.pose.x - rcfg.L*np.sin(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
             loc.y1.data = self.pose.y + rcfg.L*np.cos(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
             # sensor on X axis arm
             loc.x2.data = self.pose.x + rcfg.L*np.cos(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
@@ -77,7 +77,6 @@ class SimInterface():
             loc.theta.data = self.pose.theta + np.random.uniform(-self.theta_noise, self.theta_noise)
 
             self.decawave_pub.publish(loc)
-
 
     def run(self):
         rate = rospy.Rate(10) # 10 Hz
