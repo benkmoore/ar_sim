@@ -17,7 +17,7 @@
   </include>
 
   <!-- Load the URDF into the ROS Parameter Server -->
-  <param name="robot_description" command="$(find xacro)/xacro '$(find robot_description_pkg)/urdf/robot_0.xacro'" />
+  <param name="robot_description" command="$(find xacro)/xacro $(find gazebo_interface)/urdf/robot_0.xacro" /> 
 
   <!-- Load joint controller configurations from YAML file to parameter server -->
   <rosparam file="$(find gazebo_interface)/config/robot_control.yaml" command="load"/>
