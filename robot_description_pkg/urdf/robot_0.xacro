@@ -6,29 +6,31 @@
 	<xacro:include filename="$(find robot_description_pkg)/urdf/transmission.urdf.xacro" />
 	<xacro:include filename="$(find robot_description_pkg)/urdf/arm.urdf.xacro" />
 
-	<!-- properties -->
+	<!-- PROPERTIES -->
 	<!--All units in m-kg-s-radians unit system -->
 	<xacro:property name="M_PI" value="3.1415926535897931" />
 	<xacro:property name="M_PI_2" value="1.570796327" />
 	<xacro:property name="DEG_TO_RAD" value="0.017453293" />
 
-	<!-- friction coefficients -->
-	<xacro:property name="MU_1" value="10000" />
-	<xacro:property name="MU_2" value="10000" />
+	<!-- friction coefficients: https://www.engineeringtoolbox.com/friction-coefficients-d_778.html -->
+	<xacro:property name="MU_1" value="0.8" />
+	<xacro:property name="MU_2" value="0.8" />
 
-	<xacro:property name="arm_mass" value="0.4" />
+	<!-- mass (kg) -->
+	<xacro:property name="arm_mass" value="10" />
 	<xacro:property name="steer_link_mass" value="0.5" />
-	<xacro:property name="wheel_mass" value="0.3" />
+	<xacro:property name="wheel_mass" value="4" />
 
-	<xacro:property name="robot_height" value="0.15" />
+	<!-- robot dimensions (m) -->
+	<xacro:property name="robot_height" value="0.2" />
 	<xacro:property name="axis_offset" value="0.125" />
-	<xacro:property name="steer_link_length" value="0.12" />
 	<xacro:property name="steer_link_width" value="0.03" />
-	<xacro:property name="wheel_radius" value="0.05" />
-	<xacro:property name="wheel_width" value="0.03" />
+	<xacro:property name="wheel_radius" value="0.07" />
+	<xacro:property name="wheel_width" value="0.04" />
 	<xacro:property name="arm_length" value="0.6" />
-	<xacro:property name="arm_width" value="0.1" />
-	<xacro:property name="arm_thickness" value="0.025" />
+	<xacro:property name="arm_width" value="0.15" />
+	<xacro:property name="arm_thickness" value="0.1" />
+	<xacro:property name="steer_link_length" value="${arm_thickness/2+wheel_radius}" />
 
 	 <!-- Macros for calculating inertia -->
 	<xacro:macro name="cylinder_inertia" params="m r h">
