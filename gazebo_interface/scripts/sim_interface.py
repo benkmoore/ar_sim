@@ -36,18 +36,18 @@ class SimInterface():
         self.pose_pub = rospy.Publisher('pose', Pose2D, queue_size=10)
         self.decawave_pub = rospy.Publisher('sensor/decawave_measurement', Decawave, queue_size=10)
 
-        self.cmdP1_pub = rospy.Publisher("/robot_0/joint1_position_controller/command",Float64, queue_size=10)
-        self.cmdP2_pub = rospy.Publisher("/robot_0/joint2_position_controller/command",Float64, queue_size=10)
-        self.cmdP3_pub = rospy.Publisher("/robot_0/joint3_position_controller/command",Float64, queue_size=10)
-        self.cmdP4_pub = rospy.Publisher("/robot_0/joint4_position_controller/command",Float64, queue_size=10)
-        self.cmdV5_pub = rospy.Publisher("/robot_0/joint5_velocity_controller/command",Float64, queue_size=10)
-        self.cmdV6_pub = rospy.Publisher("/robot_0/joint6_velocity_controller/command",Float64, queue_size=10)
-        self.cmdV7_pub = rospy.Publisher("/robot_0/joint7_velocity_controller/command",Float64, queue_size=10)
-        self.cmdV8_pub = rospy.Publisher("/robot_0/joint8_velocity_controller/command",Float64, queue_size=10)
+        self.cmdP1_pub = rospy.Publisher("joint1_position_controller/command",Float64, queue_size=10)
+        self.cmdP2_pub = rospy.Publisher("joint2_position_controller/command",Float64, queue_size=10)
+        self.cmdP3_pub = rospy.Publisher("joint3_position_controller/command",Float64, queue_size=10)
+        self.cmdP4_pub = rospy.Publisher("joint4_position_controller/command",Float64, queue_size=10)
+        self.cmdV5_pub = rospy.Publisher("joint5_velocity_controller/command",Float64, queue_size=10)
+        self.cmdV6_pub = rospy.Publisher("joint6_velocity_controller/command",Float64, queue_size=10)
+        self.cmdV7_pub = rospy.Publisher("joint7_velocity_controller/command",Float64, queue_size=10)
+        self.cmdV8_pub = rospy.Publisher("joint8_velocity_controller/command",Float64, queue_size=10)
 
         # subscribers
         rospy.Subscriber('/gazebo/model_states', ModelStates, self.model_statesCallback)
-        rospy.Subscriber('/controller_cmds', ControllerCmd, self.control_cmdsCallback)
+        rospy.Subscriber('controller_cmds', ControllerCmd, self.control_cmdsCallback)
 
 
     def control_cmdsCallback(self, msg):
@@ -60,9 +60,10 @@ class SimInterface():
         self.pose.theta = self.theta # sim outputs [-pi, pi]
 
     def model_statesCallback(self, msg):
-        if len(msg.pose) >= 2:
-            self.pos = msg.pose[1].position
-            self.q = msg.pose[1].orientation
+        try:
+            idx = msg.name.index(rospy.get_namespace()[1:-1])
+            self.pos = msg.pose[idx].position
+            self.q = msg.pose[idx].orientation
             _, _, self.theta = euler_from_quaternion([self.q.x, self.q.y, self.q.z, self.q.w])
             self.modelStates2Pose2D()
 
@@ -77,6 +78,8 @@ class SimInterface():
             loc.theta.data = self.pose.theta + np.random.uniform(-self.theta_noise, self.theta_noise)
 
             self.decawave_pub.publish(loc)
+        except ValueError:
+            pass
 
     def run(self):
         rate = rospy.Rate(10) # 10 Hz
