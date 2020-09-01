@@ -3,10 +3,10 @@
 	<arg name="gui" default="true"/>
 
 	<param name="robot_description" command="$(find xacro)/xacro
-	$(find robot_description_pkg)/urdf/robot_0.xacro"/>
+	$(find ar_sim)/urdf/robot_0.xacro"/>
 
 	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
 	<node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />		
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find robot_description_pkg)/urdf.rviz" required="true" />
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find ar_sim)/urdf.rviz" required="true" />
 </launch>
