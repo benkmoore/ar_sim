@@ -5,10 +5,10 @@
   <arg name="robot_id"/>
 
   <!-- Load the URDF into the ROS Parameter Server -->
-  <param name="robot_description" command="$(find xacro)/xacro '$(find robot_description_pkg)/urdf/robot_0.xacro'" />
+  <param name="robot_description" command="$(find xacro)/xacro $(find ar_sim)/urdf/robot_0.xacro" />
 
   <!-- Load joint controller configurations from YAML file to parameter server -->
-  <rosparam file="$(find gazebo_interface)/config/robot_control.yaml" command="load" />
+  <rosparam file="$(find ar_sim)/config/robot_control.yaml" command="load"/>
 
   <!-- Load the controllers -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
@@ -32,6 +32,6 @@
         args="-urdf -model $(arg robot_id) -param robot_description $(arg init_pose)" />
 
   <!-- Start simulation interface -->
-  <node pkg="gazebo_interface" type="sim_interface.py" name="sim_interface" output="screen" />
+  <node pkg="ar_sim" type="sim_interface.py" name="sim_interface" output="screen" />
 
 </launch>

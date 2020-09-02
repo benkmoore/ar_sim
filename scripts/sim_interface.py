@@ -10,7 +10,7 @@ from geometry_msgs.msg import Pose2D
 from std_msgs.msg import Float64MultiArray, Float64
 from tf.transformations import euler_from_quaternion
 
-sys.path.append(rospy.get_param("GAZEBO_DIR"))
+sys.path.append(rospy.get_param("AR_SIM_DIR"))
 sys.path.append(rospy.get_param("AR_COMMANDER_DIR"))
 
 import config.sim_interface_params as params
