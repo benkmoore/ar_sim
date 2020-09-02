@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="AR_0">
 
-	<xacro:include filename="$(find robot_description_pkg)/urdf/wheel.urdf.xacro" />
-	<xacro:include filename="$(find robot_description_pkg)/urdf/steering_column.urdf.xacro" />
-	<xacro:include filename="$(find robot_description_pkg)/urdf/transmission.urdf.xacro" />
-	<xacro:include filename="$(find robot_description_pkg)/urdf/arm.urdf.xacro" />
+	<xacro:include filename="$(find ar_sim)/urdf/wheel.urdf.xacro" />
+	<xacro:include filename="$(find ar_sim)/urdf/steering_column.urdf.xacro" />
+	<xacro:include filename="$(find ar_sim)/urdf/transmission.urdf.xacro" />
+	<xacro:include filename="$(find ar_sim)/urdf/arm.urdf.xacro" />
 
 	<!-- PROPERTIES -->
 	<!--All units in m-kg-s-radians unit system -->
