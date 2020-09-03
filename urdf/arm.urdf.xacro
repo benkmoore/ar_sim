@@ -20,14 +20,14 @@
 			</collision>
 			<inertial>
 				<mass value="${arm_mass}"/>
-				<inertia ixx="${arm_mass}" ixy="0.0" ixz="0.0" iyy="${arm_mass}" 
+				<inertia ixx="${arm_mass}" ixy="0.0" ixz="0.0" iyy="${arm_mass}"
 					iyz="0.0" izz="${arm_mass}"/>
 			</inertial>
 		</link>
 
 		<gazebo reference="${arm_name}">
 			<turnGravityOff>false</turnGravityOff>
-		</gazebo>					
+		</gazebo>
 
 	</xacro:macro>
 </robot>

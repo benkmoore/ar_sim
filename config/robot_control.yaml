@@ -32,3 +32,42 @@ joint7_velocity_controller:
 joint8_velocity_controller:
   type: velocity_controllers/JointVelocityController
   joint: drive_joint_r2
+
+
+# gazebo_ros_control:
+#   pid_gains:
+#     yaw_joint_l1:
+#       p: 100.0
+#       i: 0.01
+#       d: 10.0
+#     yaw_joint_l2:
+#       p: 100.0
+#       i: 0.01
+#       d: 10.0
+#     yaw_joint_r1:
+#       p: 100.0
+#       i: 0.01
+#       d: 10.0
+#     yaw_joint_r2:
+#       p: 100.0
+#       i: 0.01
+#       d: 10.0
+#     drive_joint_l1:
+#       p: 100.0
+#       i: 0.01
+#       d: 10.0
+#     drive_joint_l2:
+#       p: 100.0
+#       i: 0.01
+#       d: 10.0
+#     drive_joint_r1:
+#       p: 100.0
+#       i: 0.01
+#       d: 10.0
+#     drive_joint_r2:
+#       p: 100.0
+#       i: 0.01
+#       d: 10.0
+
+
+

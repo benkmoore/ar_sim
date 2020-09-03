@@ -28,9 +28,9 @@
 	<xacro:property name="wheel_radius" value="0.07" />
 	<xacro:property name="wheel_width" value="0.04" />
 	<xacro:property name="arm_length" value="0.6" />
-	<xacro:property name="arm_width" value="0.15" />
 	<xacro:property name="arm_thickness" value="0.1" />
-	<xacro:property name="steer_link_length" value="${arm_thickness/2+wheel_radius}" />
+	<xacro:property name="arm_width" value="0.15" />
+	<xacro:property name="steer_link_length" value="0.02" /> <!-- ${arm_thickness/2+wheel_radius} -->
 
 	 <!-- Macros for calculating inertia -->
 	<xacro:macro name="cylinder_inertia" params="m r h">
@@ -66,13 +66,13 @@
 		<turnGravityOff>false</turnGravityOff>
 	</gazebo>
 
-	<!-- left arm -->
-	<xacro:arm arm_name="left_arm" arm_length="${arm_length}" arm_width="${arm_width}"
+	<!-- x axis arm -->
+	<xacro:arm arm_name="arm_x" arm_length="${arm_length}" arm_width="${arm_width}"
 						arm_thickness="${arm_thickness}" arm_mass="${arm_mass}"
 						rotation_angle="0" X="${(arm_length-arm_width)/2}" Y="0" robot_height="${robot_height}" />
 
-	<!-- right arm -->
-	<xacro:arm arm_name="right_arm" arm_length="${arm_length}" arm_width="${arm_width}"
+	<!-- y axis arm: shorter to avoid coliision with x axis arm -->
+	<xacro:arm arm_name="arm_y" arm_length="0.5" arm_width="${arm_width}"
 						arm_thickness="${arm_thickness}" arm_mass="${arm_mass}"
 						rotation_angle="${M_PI_2}" X="0" Y="${(arm_length-arm_width)/2}" robot_height="${robot_height}" />
 
@@ -80,13 +80,13 @@
 	<joint name="base_footprint_joint_l" type="fixed">
 		<origin xyz="0 0 0" rpy="0 0 0" />
 		<parent link="base_footprint"/>
-		<child link="left_arm" />
+		<child link="arm_x" />
 	</joint>
 
 	<joint name="base_footprint_joint_r" type="fixed">
 		<origin xyz="0 0 0" rpy="0 0 0" />
 		<parent link="base_footprint"/>
-		<child link="right_arm" />
+		<child link="arm_y" />
 	</joint>
 
 	<!-- steering link l1 -->
@@ -107,7 +107,7 @@
 
 	<!-- yaw joint l1 -->
 	<joint name="yaw_joint_l1" type="continuous">
-		<parent link="left_arm"/>
+		<parent link="arm_x"/>
 		<child link="steering_link_l1"/>
 		<origin xyz="${axis_offset} 0 0" rpy="0 0 ${M_PI}"/>
 		<axis xyz="0 0 1"/>
@@ -115,7 +115,7 @@
 
 	<!-- yaw joint l2 -->
 	<joint name="yaw_joint_l2" type="continuous">
-		<parent link="left_arm"/>
+		<parent link="arm_x"/>
 		<child link="steering_link_l2"/>
 		<origin xyz="${arm_length-axis_offset} 0 0" rpy="0 0 ${M_PI}"/>
 		<axis xyz="0 0 1"/>
@@ -123,7 +123,7 @@
 
 	<!-- yaw joint r1 -->
 	<joint name="yaw_joint_r1" type="continuous">
-		<parent link="right_arm"/>
+		<parent link="arm_y"/>
 		<child link="steering_link_r1"/>
 		<origin xyz="0 ${axis_offset} 0" rpy="0 0 ${M_PI}"/>
 		<axis xyz="0 0 1"/>
@@ -131,7 +131,7 @@
 
 	<!-- yaw joint r2 -->
 	<joint name="yaw_joint_r2" type="continuous">
-		<parent link="right_arm"/>
+		<parent link="arm_y"/>
 		<child link="steering_link_r2"/>
 		<origin xyz="0 ${arm_length-axis_offset} 0" rpy="0 0 ${M_PI}"/>
 		<axis xyz="0 0 1"/>
