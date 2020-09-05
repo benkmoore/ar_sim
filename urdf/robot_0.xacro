@@ -186,28 +186,28 @@
 	</joint>
 
 	<!-- Transmission: drive, select: effort/vel/pos interfaces -->
-	<xacro:set_transmission transmission_name="l1_wheel_joint_trans" motor_name="l1_wheel_motor" interface="VelocityJointInterface" joint_name="drive_joint_l1" />
+	<xacro:set_transmission transmission_name="l1_wheel_joint_trans" motor_name="l1_wheel_motor" interface="EffortJointInterface" joint_name="drive_joint_l1" />
 
-	<xacro:set_transmission transmission_name="l2_wheel_joint_trans" motor_name="l2_wheel_motor" interface="VelocityJointInterface" joint_name="drive_joint_l2" />
+	<xacro:set_transmission transmission_name="l2_wheel_joint_trans" motor_name="l2_wheel_motor" interface="EffortJointInterface" joint_name="drive_joint_l2" />
 
 	<xacro:set_transmission transmission_name="r1_wheel_joint_trans" motor_name=
-		"r1_wheel_motor" interface="VelocityJointInterface" joint_name="drive_joint_r1" />
+		"r1_wheel_motor" interface="EffortJointInterface" joint_name="drive_joint_r1" />
 
 	<xacro:set_transmission transmission_name="r2_wheel_joint_trans" motor_name=
-		"r2_wheel_motor" interface="VelocityJointInterface" joint_name="drive_joint_r2" />
+		"r2_wheel_motor" interface="EffortJointInterface" joint_name="drive_joint_r2" />
 
 	<!-- Transmission: yaw -->
 	<xacro:set_transmission transmission_name="l1_yaw_joint_trans" motor_name=
-		"l1_steer_motor" interface="PositionJointInterface" joint_name="yaw_joint_l1" />
+		"l1_steer_motor" interface="EffortJointInterface" joint_name="yaw_joint_l1" />
 
 	<xacro:set_transmission transmission_name="l2_yaw_joint_trans" motor_name=
-		"l2_steer_motor" interface="PositionJointInterface" joint_name="yaw_joint_l2" />
+		"l2_steer_motor" interface="EffortJointInterface" joint_name="yaw_joint_l2" />
 
 	<xacro:set_transmission transmission_name="r1_yaw_joint_trans" motor_name=
-		"r1_steer_motor" interface="PositionJointInterface" joint_name="yaw_joint_r1" />
+		"r1_steer_motor" interface="EffortJointInterface" joint_name="yaw_joint_r1" />
 
 	<xacro:set_transmission transmission_name="r2_yaw_joint_trans" motor_name=
-		"r2_steer_motor" interface="PositionJointInterface" joint_name="yaw_joint_r2" />
+		"r2_steer_motor" interface="EffortJointInterface" joint_name="yaw_joint_r2" />
 
 	<!-- ros_control plugin -->
 	<gazebo>
