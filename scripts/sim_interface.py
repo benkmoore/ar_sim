@@ -2,6 +2,8 @@
 
 import rospy
 import numpy as np
+import numpy.linalg as npl
+import collections
 import sys
 
 from ar_commander.msg import ControllerCmd, Decawave
@@ -23,12 +25,30 @@ class SimInterface():
         # gazebo model states to Pose2D
         rospy.init_node('sim_interface')
 
+        # localization variables & covariances
         self.pose = Pose2D()
         self.pos = None
         self.theta = None
+        self.cov1 = None
+        self.cov2 = None
+        self.cov_theta = None
+
+        # previous measurements
+        self.pos1_prev = None
+        self.pos2_prev = None
+        self.theta_prev = None
+
+        # sample covariance deque
+        self.pos1_q = collections.deque([])
+        self.pos2_q = collections.deque([])
+        self.N = 10 # number of samples in covariance
+
+        # control cmds
         self.control_cmds = None
         self.W_cmd = None
         self.phi_cmd = None
+
+        # measurement noise params
         self.pos_noise = params.position_noise
         self.theta_noise = params.theta_noise
 
@@ -68,18 +88,59 @@ class SimInterface():
             self.modelStates2Pose2D()
 
             # publish noisy localization data and transform to end of robot arms
-            loc = Decawave()
-            # sensor on Y axis arm
-            loc.x1.data = self.pose.x - rcfg.L*np.sin(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
-            loc.y1.data = self.pose.y + rcfg.L*np.cos(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
-            # sensor on X axis arm
-            loc.x2.data = self.pose.x + rcfg.L*np.cos(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
-            loc.y2.data = self.pose.y + rcfg.L*np.sin(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
-            loc.theta.data = self.pose.theta + np.random.uniform(-self.theta_noise, self.theta_noise)
+            loc_data = self.getLocalizationData()
+            print(loc_data)
+            self.decawave_pub.publish(loc_data)
+        except ValueError as e:
+            print(e)
 
-            self.decawave_pub.publish(loc)
-        except ValueError:
-            pass
+    def getLocalizationData(self):
+        loc = Decawave()
+        # sensor on Y axis arm
+        loc.x1.data = self.pose.x - rcfg.L*np.sin(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
+        loc.y1.data = self.pose.y + rcfg.L*np.cos(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
+        # sensor on X axis arm
+        loc.x2.data = self.pose.x + rcfg.L*np.cos(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
+        loc.y2.data = self.pose.y + rcfg.L*np.sin(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
+        loc.theta.data = self.pose.theta + np.random.uniform(-self.theta_noise, self.theta_noise)
+
+        # covariances
+        self.findlocalizationCovs(loc.x1.data, loc.y1.data, loc.x2.data, loc.y2.data, loc.theta.data)
+        loc.cov1.data = self.cov1
+        loc.cov2.data = self.cov2
+        loc.cov_theta.data = self.cov_theta
+
+        return loc
+
+    def findlocalizationCovs(self, x1, y1, x2, y2, theta):
+        pos1 = np.array([x1, y1])
+        pos2 = np.array([x2, y2])
+        if len(self.pos1_q) >= self.N or len(self.pos2_q) >= self.N:
+            _ = self.pos1_q.popleft()
+            _ = self.pos2_q.popleft()
+        self.pos1_q.append(pos1)
+        self.pos2_q.append(pos2)
+
+        self.cov1 = np.cov(np.asarray(self.pos1_q).T)
+        self.cov2 = np.cov(np.asarray(self.pos2_q).T)
+
+        if self.pos1_prev is None or self.pos2_prev is None or self.theta_prev is None:
+            delta_pos1 = delta_pos2 = np.ones(2)
+            delta_theta = 1
+        else:
+            delta_pos1 = pos1 - self.pos1_prev
+            delta_pos2 = pos2 - self.pos2_prev
+            delta_theta = theta - self.theta_prev
+
+        dth_dp1 = abs(delta_theta/delta_pos1)
+        dth_dp2 = abs(delta_theta/delta_pos2)
+        self.cov_theta = npl.multi_dot((dth_dp1, self.cov1, dth_dp1)) \
+                                + npl.multi_dot((dth_dp2, self.cov2, dth_dp2))
+
+        # update previous measurements
+        self.pos1_prev = pos1
+        self.pos2_prev = pos2
+        self.theta_prev = theta
 
     def run(self):
         rate = rospy.Rate(10) # 10 Hz
