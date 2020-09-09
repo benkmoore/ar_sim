@@ -3,7 +3,6 @@
 import rospy
 import numpy as np
 import numpy.linalg as npl
-import collections
 import sys
 
 from ar_commander.msg import ControllerCmd, Decawave
@@ -33,16 +32,6 @@ class SimInterface():
         self.cov_pos1 = None
         self.cov_pos2 = None
         self.cov_theta = None
-
-        # previous measurements
-        self.pos1_prev = None
-        self.pos2_prev = None
-        self.theta_prev = None
-
-        # sample covariance deque
-        self.pos1_q = collections.deque([])
-        self.pos2_q = collections.deque([])
-        self.N = 10 # number of samples in covariance
 
         # control cmds
         self.control_cmds = None
@@ -105,48 +94,20 @@ class SimInterface():
         # sensor on X axis arm
         loc.x2.data = self.pose.x + rcfg.L*np.cos(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
         loc.y2.data = self.pose.y + rcfg.L*np.sin(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
+        # theta
         loc.theta.data = self.pose.theta + np.random.uniform(-self.theta_noise, self.theta_noise)
 
-        self.findlocalizationCovs(loc.x1.data, loc.y1.data, loc.x2.data, loc.y2.data, loc.theta.data)
-        if self.cov_pos1 is not None and self.cov_pos2 is not None and self.cov_theta is not None:
-            loc.cov1.data = self.cov_pos1.reshape(-1)
-            loc.cov2.data = self.cov_pos2.reshape(-1)
-            loc.cov_theta.data = self.cov_theta
+        loc.cov1.data = self.covsUniformDist(-self.pos_noise, self.pos_noise, dim=2).reshape(-1)
+        loc.cov2.data = self.covsUniformDist(-self.pos_noise, self.pos_noise, dim=2).reshape(-1)
+        loc.cov_theta.data = self.covsUniformDist(-self.theta_noise, self.theta_noise, dim=1)
 
         return loc
 
 
-    def findlocalizationCovs(self, x1, y1, x2, y2, theta):
-        pos1 = np.array([x1, y1])
-        pos2 = np.array([x2, y2])
-        if len(self.pos1_q) >= self.N or len(self.pos2_q) >= self.N:
-            _ = self.pos1_q.popleft()
-            _ = self.pos2_q.popleft()
-        self.pos1_q.append(pos1)
-        self.pos2_q.append(pos2)
+    def covsUniformDist(self, noise_low, noise_high, dim):
+        cov = ((noise_high**3)-(noise_low**3))/(3*(noise_high-noise_low))*np.eye(dim)
 
-        if len(self.pos1_q) > 1 and len(self.pos2_q) > 1: # avoid true_divide error
-            self.cov_pos1 = np.cov(np.asarray(self.pos1_q).T)
-            self.cov_pos2 = np.cov(np.asarray(self.pos2_q).T)
-
-        if self.pos1_prev is None or self.pos2_prev is None or self.theta_prev is None:
-            delta_pos1 = delta_pos2 = np.ones(2)
-            delta_theta = 1
-        else:
-            delta_pos1 = pos1 - self.pos1_prev
-            delta_pos2 = pos2 - self.pos2_prev
-            delta_theta = theta - self.theta_prev
-        dth_dp1 = abs(delta_theta/delta_pos1)
-        dth_dp2 = abs(delta_theta/delta_pos2)
-
-        if self.cov_pos1 is not None and self.cov_pos2 is not None:
-            self.cov_theta = npl.multi_dot((dth_dp1, self.cov_pos1, dth_dp1)) \
-                                + npl.multi_dot((dth_dp2, self.cov_pos2, dth_dp2))
-
-        # update previous measurements
-        self.pos1_prev = pos1
-        self.pos2_prev = pos2
-        self.theta_prev = theta
+        return cov
 
 
     def publishSimMsgs(self):
