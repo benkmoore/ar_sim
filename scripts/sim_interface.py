@@ -72,9 +72,11 @@ class SimInterface():
             # sensor on Y axis arm
             loc.x1.data = self.pose.x - rcfg.L*np.sin(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
             loc.y1.data = self.pose.y + rcfg.L*np.cos(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
+            loc.new_meas1.data = True
             # sensor on X axis arm
             loc.x2.data = self.pose.x + rcfg.L*np.cos(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
             loc.y2.data = self.pose.y + rcfg.L*np.sin(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
+            loc.new_meas2.data = True
             loc.theta.data = self.pose.theta + np.random.uniform(-self.theta_noise, self.theta_noise)
 
             self.decawave_pub.publish(loc)
