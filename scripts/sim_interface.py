@@ -2,6 +2,7 @@
 
 import rospy
 import numpy as np
+import numpy.random as npr
 import sys
 
 from ar_commander.msg import ControllerCmd, Decawave
@@ -70,12 +71,12 @@ class SimInterface():
             # publish noisy localization data and transform to end of robot arms
             loc = Decawave()
             # sensor on Y axis arm
-            loc.x1.data = self.pose.x - rcfg.L*np.sin(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
-            loc.y1.data = self.pose.y + rcfg.L*np.cos(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
+            loc.x1.data = self.pose.x - rcfg.L*np.sin(self.theta) + npr.normal(0.0, self.pos_noise)
+            loc.y1.data = self.pose.y + rcfg.L*np.cos(self.theta) + npr.normal(0.0, self.pos_noise)
             # sensor on X axis arm
-            loc.x2.data = self.pose.x + rcfg.L*np.cos(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
-            loc.y2.data = self.pose.y + rcfg.L*np.sin(self.theta) + np.random.uniform(-self.pos_noise, self.pos_noise)
-            loc.theta.data = self.pose.theta + np.random.uniform(-self.theta_noise, self.theta_noise)
+            loc.x2.data = self.pose.x + rcfg.L*np.cos(self.theta) + npr.normal(0.0, self.pos_noise)
+            loc.y2.data = self.pose.y + rcfg.L*np.sin(self.theta) + npr.normal(0.0, self.pos_noise)
+            loc.theta.data = self.pose.theta + npr.normal(0.0, self.theta_noise)
 
             self.decawave_pub.publish(loc)
         except ValueError:
