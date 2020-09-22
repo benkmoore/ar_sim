@@ -96,8 +96,8 @@ class SimInterface:
             _, _, self.theta = euler_from_quaternion(
                 [self.q.x, self.q.y, self.q.z, self.q.w]
             )
-            self.modelStates2Pose2D()
 
+            self.modelStates2Pose2D()
             self.simLocalizationData()  # sim noisy localization data
 
         except ValueError:
@@ -125,6 +125,10 @@ class SimInterface:
         self.loc.cov1.data = ((self.pos_noise ** 2) * np.eye(2)).reshape(-1)
         self.loc.cov2.data = ((self.pos_noise ** 2) * np.eye(2)).reshape(-1)
         self.loc.cov_theta.data = self.theta_noise ** 2
+
+        # new measurement flags
+        self.loc.new_meas1.data = True
+        self.loc.new_meas2.data = True
 
     def publishSimMsgs(self):
         # Publish pose and noisy localization data to GNC
