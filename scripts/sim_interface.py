@@ -27,6 +27,7 @@ class SimInterface:
         rospy.init_node("sim_interface")
 
         # localization variables & covariances
+        self.loc = Decawave()
         self.pose = Pose2D()
         self.pos = None
         self.theta = None
@@ -97,80 +98,41 @@ class SimInterface:
             )
             self.modelStates2Pose2D()
 
-            # publish noisy localization data and transform to end of robot arms
-            loc = Decawave()
-            # sensor on Y axis arm
-            loc.x1.data = (
-                self.pose.x
-                - rcfg.L * np.sin(self.theta)
-                + npr.normal(0.0, self.pos_noise)
-            )
-            loc.y1.data = (
-                self.pose.y
-                + rcfg.L * np.cos(self.theta)
-                + npr.normal(0.0, self.pos_noise)
-            )
-            # sensor on X axis arm
-            loc.x2.data = (
-                self.pose.x
-                + rcfg.L * np.cos(self.theta)
-                + npr.normal(0.0, self.pos_noise)
-            )
-            loc.y2.data = (
-                self.pose.y
-                + rcfg.L * np.sin(self.theta)
-                + npr.normal(0.0, self.pos_noise)
-            )
-            loc.theta.data = self.pose.theta + npr.normal(0.0, self.theta_noise)
+            self.simLocalizationData()  # sim noisy localization data
 
-            self.decawave_pub.publish(loc)
-            # sim noisy localization data from decawave sensors
-            loc_data = self.getLocalizationData()
-            self.decawave_pub.publish(loc_data)
         except ValueError:
             pass
 
-    def getLocalizationData(self):
-        loc = Decawave()
-        # sensor on Y axis arm
-        loc.x1.data = (
-            self.pose.x
-            - rcfg.L * np.sin(self.theta)
-            + np.random.uniform(-self.pos_noise, self.pos_noise)
+    def simLocalizationData(self):
+        # publish noisy localization data and transform to end of robot arms
+        self.loc.x1.data = (  # sensor on Y axis arm
+            self.pose.x - rcfg.L * np.sin(self.theta) + npr.normal(0.0, self.pos_noise)
         )
-        loc.y1.data = (
-            self.pose.y
-            + rcfg.L * np.cos(self.theta)
-            + np.random.uniform(-self.pos_noise, self.pos_noise)
+        self.loc.y1.data = (
+            self.pose.y + rcfg.L * np.cos(self.theta) + npr.normal(0.0, self.pos_noise)
         )
-        # sensor on X axis arm
-        loc.x2.data = (
-            self.pose.x
-            + rcfg.L * np.cos(self.theta)
-            + np.random.uniform(-self.pos_noise, self.pos_noise)
+        self.loc.x2.data = (  # sensor on X axis arm
+            self.pose.x + rcfg.L * np.cos(self.theta) + npr.normal(0.0, self.pos_noise)
         )
-        loc.y2.data = (
-            self.pose.y
-            + rcfg.L * np.sin(self.theta)
-            + np.random.uniform(-self.pos_noise, self.pos_noise)
+        self.loc.y2.data = (
+            self.pose.y + rcfg.L * np.sin(self.theta) + npr.normal(0.0, self.pos_noise)
         )
-        # theta
-        loc.theta.data = self.pose.theta + np.random.uniform(
-            -self.theta_noise, self.theta_noise
+        self.loc.theta.data = self.pose.theta + npr.normal(  # theta measurement
+            0.0, self.theta_noise
         )
 
         # covariances: normal distribution: standard deviation^2
-        loc.cov1.data = ((self.pos_noise ** 2) * np.eye(2)).reshape(-1)
-        loc.cov2.data = ((self.pos_noise ** 2) * np.eye(2)).reshape(-1)
-        loc.cov_theta.data = self.theta_noise ** 2
-
-        return loc
+        self.loc.cov1.data = ((self.pos_noise ** 2) * np.eye(2)).reshape(-1)
+        self.loc.cov2.data = ((self.pos_noise ** 2) * np.eye(2)).reshape(-1)
+        self.loc.cov_theta.data = self.theta_noise ** 2
 
     def publishSimMsgs(self):
-        # Publish pose to GNC
+        # Publish pose and noisy localization data to GNC
         self.pose_pub.publish(self.pose)
+        if self.pos is not None:
+            self.decawave_pub.publish(self.loc)
 
-        # Publish GNC cmds to sim joints
+        # Publish cmds to motors
         if self.phi_cmd != None and self.W_cmd != None:
             self.cmdP1_pub.publish(
                 self.phi_cmd[2]
