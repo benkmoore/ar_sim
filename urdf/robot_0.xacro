@@ -1,15 +1,26 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="AR_0">
 
+    <!-- robot parts -->
 	<xacro:include filename="$(find ar_sim)/urdf/wheel.urdf.xacro" />
 	<xacro:include filename="$(find ar_sim)/urdf/steering_column.urdf.xacro" />
-	<xacro:include filename="$(find ar_sim)/urdf/transmission.urdf.xacro" />
-	<xacro:include filename="$(find ar_sim)/urdf/arm.urdf.xacro" />
+    <xacro:include filename="$(find ar_sim)/urdf/arm.urdf.xacro" />
 
+    <!-- actuation -->
+    <xacro:include filename="$(find ar_sim)/urdf/transmission.urdf.xacro" />
+
+    <!-- sensors -->
+    <xacro:include filename="$(find ar_sim)/urdf/tof.urdf.xacro" />
+
+    <!-- materials -->
+    <xacro:include filename="$(find ar_sim)/urdf/materials.xacro" />
+
+    
 	<!-- PROPERTIES -->
 	<!--All units in m-kg-s-radians unit system -->
 	<xacro:property name="M_PI" value="3.1415926535897931" />
-	<xacro:property name="M_PI_2" value="1.570796327" />
+    <xacro:property name="M_PI_2" value="1.570796327" />
+    <xacro:property name="M_PI_4" value="0.7853981635" />
 	<xacro:property name="DEG_TO_RAD" value="0.017453293" />
 
 	<!-- friction coefficients: https://www.engineeringtoolbox.com/friction-coefficients-d_778.html -->
@@ -30,7 +41,11 @@
 	<xacro:property name="arm_length" value="0.6" />
 	<xacro:property name="arm_width" value="0.15" />
 	<xacro:property name="arm_thickness" value="0.1" />
-	<xacro:property name="steer_link_length" value="${arm_thickness/2+wheel_radius}" />
+    <xacro:property name="steer_link_length" value="${arm_thickness/2+wheel_radius}" />
+    
+    <!-- sensor properties -->
+    <xacro:property name="TOF_rate" value="30" /> <!-- Hz -->
+    <xacro:property name="visualize_TOFs" value="true" />
 
 	 <!-- Macros for calculating inertia -->
 	<xacro:macro name="cylinder_inertia" params="m r h">
@@ -43,17 +58,8 @@
 		iyy="${m*(w*w+l*l)/12}" iyz = "0" izz="${m*(h*h+w*w)/12}" />
 	</xacro:macro>
 
-	<!-- Materials -->
-	<material name="black">
-		<color rgba="0 0 0 1"/>
-	</material>
-	<material name="white">
-		<color rgba="1 1 1 1"/>
-	</material>
-
-	<!-- BASE-FOOTPRINT -->
- 	<!-- base_footprint is a fictitious link(frame)that is on the ground right below base_link origin -->
-	<link name="base_footprint">
+	<!-- BASE FOOTPRINT -->
+    <link name="base_footprint">
 		<visual>
 			<origin xyz="0 0 0" rpy="0 0 0" />
 			<geometry>
@@ -216,5 +222,17 @@
 			<legacyModeNS>true</legacyModeNS>
 		</plugin>
 	</gazebo>
+
+
+    <!-- TOF sensors -->
+    <xacro:tof_sensor name="tof1" parent="tof1_parent_joint" base="base_footprint" 
+                      xyz="${arm_thickness} ${arm_thickness} ${robot_height}" rpy="0 0 ${M_PI_4}" rate="${TOF_rate}"
+                      visualize="${visualize_TOFs}"/>
+    <xacro:tof_sensor name="tof2" parent="tof2_parent_joint" base="base_footprint" 
+                      xyz="${arm_thickness} ${arm_length-arm_thickness} ${robot_height}" rpy="0 0 0" 
+                      rate="${TOF_rate}" visualize="${visualize_TOFs}"/>
+    <xacro:tof_sensor name="tof3" parent="tof3_parent_joint" base="base_footprint" 
+                      xyz="${arm_length-arm_thickness} ${arm_thickness} ${robot_height}" rpy="0 0 ${M_PI_2}" 
+                      rate="${TOF_rate}" visualize="${visualize_TOFs}"/>
 
 </robot>
