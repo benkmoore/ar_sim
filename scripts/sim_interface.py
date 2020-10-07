@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 
 import rospy
+import rospkg
+import sys
 import numpy as np
 import numpy.random as npr
 import numpy.linalg as npl
-import sys
+
+sys.path.append(rospkg.RosPack().get_path('ar_commander'))
 
 from ar_commander.msg import ControllerCmd, Decawave
 from gazebo_msgs.msg import ModelStates
@@ -12,10 +15,7 @@ from geometry_msgs.msg import Pose2D
 from std_msgs.msg import Float64
 from tf.transformations import euler_from_quaternion
 
-sys.path.append(rospy.get_param("AR_SIM_DIR"))
-sys.path.append(rospy.get_param("AR_COMMANDER_DIR"))
-
-import config.sim_interface_params as params
+import configs.sim_interface_params as params
 import configs.robot_v1 as rcfg
 
 # take model states msg and publish a curr pose in Pose2D format
@@ -24,7 +24,7 @@ import configs.robot_v1 as rcfg
 class SimInterface:
     def __init__(self):
         # gazebo model states to Pose2D
-        rospy.init_node("sim_interface")
+        rospy.init_node("simInterface")
 
         # localization variables & covariances
         self.loc = Decawave()
