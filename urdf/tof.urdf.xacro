@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-<xacro:macro name="tof_sensor" params="name parent base xyz rpy rate visualize">
+<xacro:macro name="tof_sensor" params="name base xyz rpy rate visualize">
 <!-- TOF sensor -->
-    <joint name="${parent}" type="fixed">
+    <joint name="${name}_parent_joint" type="fixed">
         <origin xyz="${xyz}" rpy="${rpy}"/>
         <parent link="${base}"/>
         <child link="${name}"/>
@@ -26,7 +26,7 @@
     </link>
 
     <gazebo reference="${name}">
-        <sensor name="laser" type="ray">
+        <sensor name="${name}" type="ray">
             <pose>0 0 0 0 0 0</pose>
             <ray>
                 <scan>
@@ -37,6 +37,7 @@
                         <samples>1</samples>
                     </horizontal>
                     </scan>
+
                     <range>
                       <min>0.01</min>
                       <max>4</max>

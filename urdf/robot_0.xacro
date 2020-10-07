@@ -225,14 +225,11 @@
 
 
     <!-- TOF sensors -->
-    <xacro:tof_sensor name="tof1" parent="tof1_parent_joint" base="base_footprint" 
-                      xyz="${arm_thickness} ${arm_thickness} ${robot_height}" rpy="0 0 ${M_PI_4}" rate="${TOF_rate}"
-                      visualize="${visualize_TOFs}"/>
-    <xacro:tof_sensor name="tof2" parent="tof2_parent_joint" base="base_footprint" 
-                      xyz="${arm_thickness} ${arm_length-arm_thickness} ${robot_height}" rpy="0 0 0" 
-                      rate="${TOF_rate}" visualize="${visualize_TOFs}"/>
-    <xacro:tof_sensor name="tof3" parent="tof3_parent_joint" base="base_footprint" 
-                      xyz="${arm_length-arm_thickness} ${arm_thickness} ${robot_height}" rpy="0 0 ${M_PI_2}" 
-                      rate="${TOF_rate}" visualize="${visualize_TOFs}"/>
+    <xacro:tof_sensor name="tof1" base="base_footprint" xyz="${arm_thickness} ${arm_length-arm_thickness} ${robot_height}"
+                      rpy="0 0 0" rate="${TOF_rate}" visualize="${visualize_TOFs}"/>
+    <xacro:tof_sensor name="tof2" base="base_footprint" xyz="${arm_thickness} ${arm_thickness} ${robot_height}"
+                      rpy="0 0 ${M_PI_4}" rate="${TOF_rate}" visualize="${visualize_TOFs}"/>
+    <xacro:tof_sensor name="tof3" base="base_footprint" xyz="${arm_length-arm_thickness} ${arm_thickness} ${robot_height}" 
+                      rpy="0 0 ${M_PI_2}" rate="${TOF_rate}" visualize="${visualize_TOFs}"/>
 
 </robot>
