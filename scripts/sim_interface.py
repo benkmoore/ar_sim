@@ -8,9 +8,7 @@ import numpy.random as npr
 import numpy.linalg as npl
 import math
 
-sys.path.append(rospkg.RosPack().get_path('ar_commander'))
 
-from configs.robotConfig import robotConfig
 from ar_commander.msg import ControllerCmd, Decawave, TOF
 from gazebo_msgs.msg import ModelStates
 from sensor_msgs.msg import LaserScan
@@ -38,7 +36,7 @@ class SimInterface:
         self.cov_theta = None
 
         # measurement noise & robot params
-        self.rcfg = robotConfig()
+        self.L = rospy.get_param("L")
         self.pos_noise = rospy.get_param("position_noise")
         self.theta_noise = rospy.get_param("theta_noise")
 
@@ -107,10 +105,10 @@ class SimInterface:
 
     def simLocalizationData(self):
         # publish noisy localization data and transform to end of robot arms
-        self.loc.x1.data = (self.pose.x - self.rcfg.L * np.sin(self.theta) + npr.normal(0.0, self.pos_noise)) # sensor on Y axis arm
-        self.loc.y1.data = (self.pose.y + self.rcfg.L * np.cos(self.theta) + npr.normal(0.0, self.pos_noise))
-        self.loc.x2.data = (self.pose.x + self.rcfg.L * np.cos(self.theta) + npr.normal(0.0, self.pos_noise)) # sensor on X axis arm
-        self.loc.y2.data = (self.pose.y + self.rcfg.L * np.sin(self.theta) + npr.normal(0.0, self.pos_noise))
+        self.loc.x1.data = (self.pose.x - self.L * np.sin(self.theta) + npr.normal(0.0, self.pos_noise)) # sensor on Y axis arm
+        self.loc.y1.data = (self.pose.y + self.L * np.cos(self.theta) + npr.normal(0.0, self.pos_noise))
+        self.loc.x2.data = (self.pose.x + self.L * np.cos(self.theta) + npr.normal(0.0, self.pos_noise)) # sensor on X axis arm
+        self.loc.y2.data = (self.pose.y + self.L * np.sin(self.theta) + npr.normal(0.0, self.pos_noise))
         self.loc.theta.data = self.pose.theta + npr.normal(0.0, self.theta_noise) # theta measurement
 
         # covariances: normal distribution: standard deviation^2
