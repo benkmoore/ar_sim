@@ -10,15 +10,13 @@ import math
 
 sys.path.append(rospkg.RosPack().get_path('ar_commander'))
 
+from configs.robotConfig import robotConfig
 from ar_commander.msg import ControllerCmd, Decawave, TOF
 from gazebo_msgs.msg import ModelStates
 from sensor_msgs.msg import LaserScan
 from geometry_msgs.msg import Pose2D
 from std_msgs.msg import Float64
 from tf.transformations import euler_from_quaternion
-
-import configs.sim_interface_params as params
-import configs.robot_v1 as rcfg
 
 RATE = 10 # Hz
 TOF_DEFAULT = 9999
@@ -39,9 +37,10 @@ class SimInterface:
         self.cov_pos2 = None
         self.cov_theta = None
 
-        # measurement noise params
-        self.pos_noise = params.position_noise
-        self.theta_noise = params.theta_noise
+        # measurement noise & robot params
+        self.rcfg = robotConfig()
+        self.pos_noise = rospy.get_param("position_noise")
+        self.theta_noise = rospy.get_param("theta_noise")
 
         # control cmds
         self.control_cmds = None
@@ -108,10 +107,10 @@ class SimInterface:
 
     def simLocalizationData(self):
         # publish noisy localization data and transform to end of robot arms
-        self.loc.x1.data = (self.pose.x - rcfg.L * np.sin(self.theta) + npr.normal(0.0, self.pos_noise)) # sensor on Y axis arm
-        self.loc.y1.data = (self.pose.y + rcfg.L * np.cos(self.theta) + npr.normal(0.0, self.pos_noise))
-        self.loc.x2.data = (self.pose.x + rcfg.L * np.cos(self.theta) + npr.normal(0.0, self.pos_noise)) # sensor on X axis arm
-        self.loc.y2.data = (self.pose.y + rcfg.L * np.sin(self.theta) + npr.normal(0.0, self.pos_noise))
+        self.loc.x1.data = (self.pose.x - self.rcfg.L * np.sin(self.theta) + npr.normal(0.0, self.pos_noise)) # sensor on Y axis arm
+        self.loc.y1.data = (self.pose.y + self.rcfg.L * np.cos(self.theta) + npr.normal(0.0, self.pos_noise))
+        self.loc.x2.data = (self.pose.x + self.rcfg.L * np.cos(self.theta) + npr.normal(0.0, self.pos_noise)) # sensor on X axis arm
+        self.loc.y2.data = (self.pose.y + self.rcfg.L * np.sin(self.theta) + npr.normal(0.0, self.pos_noise))
         self.loc.theta.data = self.pose.theta + npr.normal(0.0, self.theta_noise) # theta measurement
 
         # covariances: normal distribution: standard deviation^2
@@ -120,8 +119,8 @@ class SimInterface:
         self.loc.cov_theta.data = self.theta_noise ** 2
 
         # new measurement flags
-        self.loc.new_meas1.data = True
-        self.loc.new_meas2.data = True
+        # self.loc.new_meas1.data = True
+        # self.loc.new_meas2.data = True
 
     def publishSimMsgs(self):
         # Publish pose, tof and noisy localization data to GNC
