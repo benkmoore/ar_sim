@@ -120,8 +120,8 @@ class SimInterface:
         self.loc.cov_theta.data = self.theta_noise ** 2
 
         # new measurement flags
-        # self.loc.new_meas1.data = True
-        # self.loc.new_meas2.data = True
+        self.loc.new_meas1.data = True
+        self.loc.new_meas2.data = True
 
     def publishSimMsgs(self):
         # Publish pose, tof and noisy localization data to GNC
